@@ -22,10 +22,16 @@ Hdiff Files/*
 New Game Files/*
 Original Game Files/*
 WAV/*
+OGG/*
 Tools/New Decoding/*
 Tools/Original Decoding/*
 !Hdiff Files/.gitkeep
 !Original Game Files/.gitkeep
+!New Game Files/.gitkeep
+!WAV/.gitkeep
+!OGG/.gitkeep
+!Tools/New Decoding/.gitkeep
+!Tools/Original Decoding/.gitkeep
 
 # =========================
 # Operating System Files

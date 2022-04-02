@@ -7,10 +7,12 @@ import hashlib
 
 # Constants
 MD5_HASH_FILES = True
+CONVERT_TO_WAV = False
 
 HDIFF_DIR = "./Hdiff Files"
 ORIGINAL_DIR = "./Original Game Files"
 NEW_DIR = "./New Game Files"
+OGG_DIR = "./OGG"
 WAV_DIR = "./WAV"
 
 TOOLS_DIR = "./Tools"
@@ -59,7 +61,7 @@ def filter_diff_files(original_dir, new_dir):
     # Calculate list of new files
     original_file_list = []
     for (dirpath, dirnames, filenames) in os.walk(original_dir):
-        new_file_list.extend(filenames)
+        original_file_list.extend(filenames)
         break
     original_file_list = list(filter(lambda name: Path(name).suffix == ".wem", original_file_list))
     new_file_list = []
@@ -128,7 +130,7 @@ def get_md5(file):
 def convert_to_wav(file_dir, file_list, output_dir):
     total = len(file_list)
     iteration = 0
-    vgmstream_exec = Path.joinpath(Path(TOOLS_DIR).resolve(), "vgmstream-cli" + EXECUTABLE_EXTENSION)
+    _exec = Path.joinpath(Path(TOOLS_DIR).resolve(), "vgmstream-cli" + EXECUTABLE_EXTENSION)
     file_dir_abs = Path(file_dir).resolve()
     output_dir_abs = Path(output_dir).resolve()
     for file_name in file_list:
@@ -136,7 +138,22 @@ def convert_to_wav(file_dir, file_list, output_dir):
         show_progress(iteration, total, "", "Converting to WAV")
         file = Path.joinpath(file_dir_abs, file_name)
         output_file = Path.joinpath(output_dir_abs, file.stem + ".wav")
-        subprocess.call([vgmstream_exec, "-o", output_file, file])
+        subprocess.call([_exec, "-o", output_file, file])
+
+# Convert all files from file_dir with names in file_list to OGG format
+def convert_to_ogg(file_dir, file_list, output_dir):
+    total = len(file_list)
+    iteration = 0
+    _exec = Path.joinpath(Path(TOOLS_DIR).resolve(), "ww2ogg" + EXECUTABLE_EXTENSION)
+    codebook = Path.joinpath(Path(TOOLS_DIR).resolve(), "packed_codebooks_aoTuV_603.bin")
+    file_dir_abs = Path(file_dir).resolve()
+    output_dir_abs = Path(output_dir).resolve()
+    for file_name in file_list:
+        iteration += 1
+        show_progress(iteration, total, "", "Converting to OGG")
+        file = Path.joinpath(file_dir_abs, file_name)
+        output_file = Path.joinpath(output_dir_abs, file.stem + ".ogg")
+        subprocess.call([_exec, file, "-o", output_file, "--pcb", codebook])
 
 def show_progress(iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
@@ -153,7 +170,10 @@ def main():
     extract_files(ORIGINAL_DIR, ORIGINAL_DECODE_DIR) # Extract all original audio files
     extract_files(NEW_DIR, NEW_DECODE_DIR) # Extract all patched audio files
     new_file_list = filter_diff_files(ORIGINAL_DECODE_DIR, NEW_DECODE_DIR) # Find any new audio files that were not present in original PCK
-    convert_to_wav(NEW_DECODE_DIR, new_file_list, WAV_DIR) # Convert all new audio files to WAV
+    if CONVERT_TO_WAV:
+        convert_to_wav(NEW_DECODE_DIR, new_file_list, WAV_DIR) # Convert all new audio files to WAV
+    else:
+        convert_to_ogg(NEW_DECODE_DIR, new_file_list, OGG_DIR) # Convert all new audio files to OGG
 
 if __name__ == "__main__":
     main()
