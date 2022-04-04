@@ -128,34 +128,48 @@ def get_md5(file):
 
 # Convert all files from file_dir with names in file_list to WAV format
 def convert_to_wav(file_dir, file_list, output_dir):
-    total = len(file_list)
-    iteration = 0
-    _exec = Path.joinpath(Path(TOOLS_DIR).resolve(), "vgmstream-cli" + EXECUTABLE_EXTENSION)
-    file_dir_abs = Path(file_dir).resolve()
-    output_dir_abs = Path(output_dir).resolve()
-    for file_name in file_list:
-        iteration += 1
-        show_progress(iteration, total, "", "Converting to WAV")
-        file = Path.joinpath(file_dir_abs, file_name)
-        output_file = Path.joinpath(output_dir_abs, file.stem + ".wav")
-        subprocess.call([_exec, "-o", output_file, file])
+    if os.name == "nt":
+        total = len(file_list)
+        iteration = 0
+        vgmstream_exec = Path.joinpath(Path(TOOLS_DIR).resolve(), "vgmstream-cli" + EXECUTABLE_EXTENSION)
+        file_dir_abs = Path(file_dir).resolve()
+        output_dir_abs = Path(output_dir).resolve()
+        for file_name in file_list:
+            iteration += 1
+            show_progress(iteration, total, "", "Converting to WAV")
+            file = Path.joinpath(file_dir_abs, file_name)
+            output_file = Path.joinpath(output_dir_abs, file.stem + ".wav")
+            subprocess.call([vgmstream_exec, "-o", output_file, file])
 
 # Convert all files from file_dir with names in file_list to OGG format
 def convert_to_ogg(file_dir, file_list, output_dir):
     total = len(file_list)
     iteration = 0
-    _exec = Path.joinpath(Path(TOOLS_DIR).resolve(), "ww2ogg" + EXECUTABLE_EXTENSION)
+    ww2ogg_exec = Path.joinpath(Path(TOOLS_DIR).resolve(), "ww2ogg" + EXECUTABLE_EXTENSION)
     codebook = Path.joinpath(Path(TOOLS_DIR).resolve(), "packed_codebooks_aoTuV_603.bin")
     file_dir_abs = Path(file_dir).resolve()
     output_dir_abs = Path(output_dir).resolve()
+    output_files = []
     for file_name in file_list:
         iteration += 1
         show_progress(iteration, total, "", "Converting to OGG")
         file = Path.joinpath(file_dir_abs, file_name)
         output_file = Path.joinpath(output_dir_abs, file.stem + ".ogg")
-        subprocess.call([_exec, file, "-o", output_file, "--pcb", codebook])
+        output_files.append(output_file)
+        subprocess.call([ww2ogg_exec, file, "-o", output_file, "--pcb", codebook])
+    return output_files
 
-def show_progress(iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+def revorb(file_list):
+    total = len(file_list)
+    iteration = 0
+    if os.name == "nt":
+        revorb_exec = Path.joinpath(Path(TOOLS_DIR).resolve(), "revorb" + EXECUTABLE_EXTENSION)
+        for file in file_list:
+            iteration += 1
+            show_progress(iteration, total, "", "Optimizing OGG")
+            subprocess.call([revorb_exec, file])
+
+def show_progress(iteration, total, prefix = '', suffix = '', decimals = 1, length = 60, fill = '█', printEnd = "\r"):
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
@@ -173,7 +187,8 @@ def main():
     if CONVERT_TO_WAV:
         convert_to_wav(NEW_DECODE_DIR, new_file_list, WAV_DIR) # Convert all new audio files to WAV
     else:
-        convert_to_ogg(NEW_DECODE_DIR, new_file_list, OGG_DIR) # Convert all new audio files to OGG
+        wip_oggs = convert_to_ogg(NEW_DECODE_DIR, new_file_list, OGG_DIR) # Convert all new audio files to OGG
+        revorb(wip_oggs) # Recomputes page granule positions in OGG files
 
 if __name__ == "__main__":
     main()
