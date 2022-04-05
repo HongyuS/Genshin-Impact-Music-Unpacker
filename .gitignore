@@ -1,35 +1,16 @@
-# Windows image file caches
-Thumbs.db
-ehthumbs.db
-
-# Folder config file
-Desktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
-# Windows Installer files
-*.cab
-*.msi
-*.msm
-*.msp
-
-# Windows shortcuts
-*.lnk
-
 # Data Folders
 Hdiff Files/*
 New Game Files/*
 Original Game Files/*
-WAV/*
-OGG/*
+Output Files/WAV/*
+Output Files/OGG/*
 Tools/New Decoding/*
 Tools/Original Decoding/*
 !Hdiff Files/.gitkeep
 !Original Game Files/.gitkeep
 !New Game Files/.gitkeep
-!WAV/.gitkeep
-!OGG/.gitkeep
+!Output Files/WAV/.gitkeep
+!Output Files/OGG/.gitkeep
 !Tools/New Decoding/.gitkeep
 !Tools/Original Decoding/.gitkeep
 
@@ -57,3 +38,25 @@ Tools/Original Decoding/*
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Windows
+# =========================
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk

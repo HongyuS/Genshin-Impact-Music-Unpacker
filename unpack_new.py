@@ -12,8 +12,8 @@ CONVERT_TO_WAV = False
 HDIFF_DIR = "./Hdiff Files"
 ORIGINAL_DIR = "./Original Game Files"
 NEW_DIR = "./New Game Files"
-OGG_DIR = "./OGG"
-WAV_DIR = "./WAV"
+OGG_DIR = "./Output Files/OGG"
+WAV_DIR = "./Output Files/WAV"
 
 TOOLS_DIR = "./Tools"
 ORIGINAL_DECODE_DIR = "./Tools/Original Decoding"
