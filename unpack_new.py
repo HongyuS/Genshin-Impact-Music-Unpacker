@@ -52,7 +52,7 @@ def hpatch_files(original_dir, patch_dir, output_dir, file_list):
 # Extract individual audio files from Wwise PCK files with quickbms
 def extract_files(original_dir, output_dir):
     tools_dir_abs = Path(TOOLS_DIR).resolve()
-    subprocess.call([Path.joinpath(tools_dir_abs, "quickbms" + EXECUTABLE_EXTENSION), Path.joinpath(tools_dir_abs, "wavescan.bms"), Path(original_dir).resolve(), Path(output_dir).resolve()])
+    subprocess.call([Path.joinpath(tools_dir_abs, "quickbms" + EXECUTABLE_EXTENSION), Path.joinpath(tools_dir_abs, "wwise_pck_extractor.bms"), Path(original_dir).resolve(), Path(output_dir).resolve()])
 
 # Find and return list of all files in new_dir that are not also present in original_dir
 def filter_diff_files(original_dir, new_dir):
