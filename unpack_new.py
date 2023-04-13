@@ -8,10 +8,12 @@ import hashlib
 # Constants
 MD5_HASH_FILES = True
 CONVERT_TO_WAV = False
+CONVERT_TO_OGG = False
 
 HDIFF_DIR = "./Hdiff Files"
 ORIGINAL_DIR = "./Original Game Files"
 NEW_DIR = "./New Game Files"
+WEM_DIR = "./Output Files/WEM"
 OGG_DIR = "./Output Files/OGG"
 WAV_DIR = "./Output Files/WAV"
 
@@ -162,12 +164,11 @@ def convert_to_ogg(file_dir, file_list, output_dir):
 def revorb(file_list):
     total = len(file_list)
     iteration = 0
-    if os.name == "nt":
-        revorb_exec = Path.joinpath(Path(TOOLS_DIR).resolve(), "revorb" + EXECUTABLE_EXTENSION)
-        for file in file_list:
-            iteration += 1
-            show_progress(iteration, total, "", "Optimizing OGG")
-            subprocess.call([revorb_exec, file])
+    revorb_exec = Path.joinpath(Path(TOOLS_DIR).resolve(), "revorb" + EXECUTABLE_EXTENSION)
+    for file in file_list:
+        iteration += 1
+        show_progress(iteration, total, "", "Optimizing OGG")
+        subprocess.call([revorb_exec, file])
 
 def show_progress(iteration, total, prefix = '', suffix = '', decimals = 1, length = 60, fill = '█', printEnd = "\r"):
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
@@ -186,9 +187,22 @@ def main():
     new_file_list = filter_diff_files(ORIGINAL_DECODE_DIR, NEW_DECODE_DIR) # Find any new audio files that were not present in original PCK
     if CONVERT_TO_WAV:
         convert_to_wav(NEW_DECODE_DIR, new_file_list, WAV_DIR) # Convert all new audio files to WAV
-    else:
+    elif CONVERT_TO_OGG:
         wip_oggs = convert_to_ogg(NEW_DECODE_DIR, new_file_list, OGG_DIR) # Convert all new audio files to OGG
         revorb(wip_oggs) # Recomputes page granule positions in OGG files
+    else:
+        total = len(new_file_list)
+        iteration = 0
+        file_dir_abs = Path(NEW_DECODE_DIR).resolve()
+        output_dir_abs = Path(WEM_DIR).resolve()
+        output_files = []
+        for file_name in new_file_list:
+            iteration += 1
+            show_progress(iteration, total, "", "Passthrough new WEM")
+            file = Path.joinpath(file_dir_abs, file_name)
+            output_file = Path.joinpath(output_dir_abs, file.stem + ".wem")
+            output_files.append(output_file)
+            subprocess.call(["cp", file, output_file])
 
 if __name__ == "__main__":
     main()
