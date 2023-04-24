@@ -8,7 +8,7 @@ import hashlib
 # Constants
 MD5_HASH_FILES = True
 CONVERT_TO_WAV = False
-CONVERT_TO_OGG = False
+CONVERT_TO_OGG = True
 
 HDIFF_DIR = "./Hdiff Files"
 ORIGINAL_DIR = "./Original Game Files"
