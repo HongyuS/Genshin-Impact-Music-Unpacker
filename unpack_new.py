@@ -21,10 +21,12 @@ TOOLS_DIR = "./Tools"
 ORIGINAL_DECODE_DIR = "./Tools/Original Decoding"
 NEW_DECODE_DIR = "./Tools/New Decoding"
 
+
 # Check if running on Windows and append .exe if so
 EXECUTABLE_EXTENSION = ""
 if os.name == 'nt':
     EXECUTABLE_EXTENSION = ".exe"
+
 
 # Walk directory and return list of .hdiff files in root of directory
 def walk_dir(path):
@@ -34,6 +36,7 @@ def walk_dir(path):
         file_list.extend(filenames)
         break
     return list(filter(lambda name: Path(name).suffix == ".hdiff", file_list))
+
 
 # Run hpatch for all hdiff files listed in file_list
 # Patches files in original_dir with patches in patch_dir and output result to output_dir
@@ -51,10 +54,12 @@ def hpatch_files(original_dir, patch_dir, output_dir, file_list):
         file_name_stem = Path(file_name).stem
         subprocess.call([hpatch_exec, Path.joinpath(original_dir_abs, file_name_stem), Path.joinpath(patch_dir_abs, file_name), Path.joinpath(output_dir_abs, file_name_stem)])
 
+
 # Extract individual audio files from Wwise PCK files with quickbms
 def extract_files(original_dir, output_dir):
     tools_dir_abs = Path(TOOLS_DIR).resolve()
     subprocess.call([Path.joinpath(tools_dir_abs, "quickbms" + EXECUTABLE_EXTENSION), Path.joinpath(tools_dir_abs, "wwise_pck_extractor.bms"), Path(original_dir).resolve(), Path(output_dir).resolve()])
+
 
 # Find and return list of all files in new_dir that are not also present in original_dir
 def filter_diff_files(original_dir, new_dir):
@@ -122,26 +127,28 @@ def filter_diff_files(original_dir, new_dir):
                 return_list.append(file_name)
     return return_list
 
+
 def get_md5(file):
     try:
         return hashlib.md5(file.read_bytes()).hexdigest()
     except:
         return False
 
+
 # Convert all files from file_dir with names in file_list to WAV format
 def convert_to_wav(file_dir, file_list, output_dir):
-    if os.name == "nt":
-        total = len(file_list)
-        iteration = 0
-        vgmstream_exec = Path.joinpath(Path(TOOLS_DIR).resolve(), "vgmstream-cli" + EXECUTABLE_EXTENSION)
-        file_dir_abs = Path(file_dir).resolve()
-        output_dir_abs = Path(output_dir).resolve()
-        for file_name in file_list:
-            iteration += 1
-            show_progress(iteration, total, "", "Converting to WAV")
-            file = Path.joinpath(file_dir_abs, file_name)
-            output_file = Path.joinpath(output_dir_abs, file.stem + ".wav")
-            subprocess.call([vgmstream_exec, "-o", output_file, file])
+    total = len(file_list)
+    iteration = 0
+    vgmstream_exec = Path.joinpath(Path(TOOLS_DIR).resolve(), "vgmstream-cli" + EXECUTABLE_EXTENSION)
+    file_dir_abs = Path(file_dir).resolve()
+    output_dir_abs = Path(output_dir).resolve()
+    for file_name in file_list:
+        iteration += 1
+        show_progress(iteration, total, "", "Converting to WAV")
+        file = Path.joinpath(file_dir_abs, file_name)
+        output_file = Path.joinpath(output_dir_abs, file.stem + ".wav")
+        subprocess.call([vgmstream_exec, "-o", output_file, file])
+
 
 # Convert all files from file_dir with names in file_list to OGG format
 def convert_to_ogg(file_dir, file_list, output_dir):
@@ -161,6 +168,7 @@ def convert_to_ogg(file_dir, file_list, output_dir):
         subprocess.call([ww2ogg_exec, file, "-o", output_file, "--pcb", codebook])
     return output_files
 
+
 def revorb(file_list):
     total = len(file_list)
     iteration = 0
@@ -170,6 +178,7 @@ def revorb(file_list):
         show_progress(iteration, total, "", "Optimizing OGG")
         subprocess.call([revorb_exec, file])
 
+
 def show_progress(iteration, total, prefix = '', suffix = '', decimals = 1, length = 60, fill = '█', printEnd = "\r"):
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
@@ -178,6 +187,7 @@ def show_progress(iteration, total, prefix = '', suffix = '', decimals = 1, leng
     # Print New Line on Complete
     if iteration == total: 
         print()
+
 
 def main():
     file_list = walk_dir(HDIFF_DIR) # Gets list of all .hdiff files
@@ -203,6 +213,7 @@ def main():
             output_file = Path.joinpath(output_dir_abs, file.stem + ".wem")
             output_files.append(output_file)
             subprocess.call(["cp", file, output_file])
+
 
 if __name__ == "__main__":
     main()
